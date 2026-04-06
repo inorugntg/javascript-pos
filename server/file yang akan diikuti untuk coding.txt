@@ -1,0 +1,50 @@
+server/controllers/productController.js.
+
+const db = require('../config/db');
+
+// Fungsi untuk mengambil semua daftar produk
+const getAllProducts = async (req, res) => {
+    try {
+        // [rows] adalah cara kita mengambil hasil query (data tabel)
+        const [rows] = await db.execute('SELECT * FROM products');
+        
+        // Kirim data ke browser/frontend dalam bentuk JSON
+        res.status(200).json(rows);
+    } catch (error) {
+        // Kalau database mati atau query salah, tampilkan error di terminal
+        console.error("Error SQL:", error);
+        res.status(500).json({ message: 'Gagal mengambil data produk' });
+    }
+};
+
+module.exports = { getAllProducts };
+
+/////////////////////////////////////////////////////////////////////
+Buka file server/routes/api.js. File ini fungsinya seperti papan penunjuk jalan.
+
+JavaScript
+
+const express = require('express');
+const router = express.Router();
+const productController = require('../controllers/productController');
+
+// Jika ada yang akses: localhost:3000/api/products, jalankan fungsi getAllProducts
+router.get('/products', productController.getAllProducts);
+
+module.exports = router;
+
+///////////////////////////////////////////////////////////////////////
+Buka server/server.js. Kita harus kasih tahu mesin utama bahwa ada jalur baru bernama /api.
+
+Tambahkan kode ini sebelum bagian app.listen:
+
+JavaScript
+
+// ... kode yang sudah ada ...
+app.use(express.json());
+
+// DAFTARKAN ROUTE DI SINI
+const apiRoutes = require('./routes/api');
+app.use('/api', apiRoutes); 
+
+// ... app.get('/', ...) ...
