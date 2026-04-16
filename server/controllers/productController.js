@@ -34,5 +34,3 @@ const checkout = async (req, res) => {
 
 // Update export-nya juga!
 module.exports = { getAllProducts, checkout };
-
-module.exports = { getAllProducts,checkout };
