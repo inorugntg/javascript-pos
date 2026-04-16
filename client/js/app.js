@@ -55,14 +55,12 @@ function renderCart(){
     const cartItems = document.getElementById('cart-items');
     const cartTotal = document.getElementById('cart-total'); // GANTI INI
     const btnCheckout = document.getElementById('btn-checkout'); // GANTI INI
-
     if(cart.length === 0){
         cartItems.innerHTML = '<p class="text-muted text-center">Keranjang masih kosong</p>';
         cartTotal.innerText = 'Rp 0'; // Gunakan innerText untuk angka
         btnCheckout.disabled = true;
         return; 
     }
-
     // ... sisa kode render map ...
     cartItems.innerHTML = cart.map(item => `
         <div class="d-flex justify-content-between mb-2">
@@ -70,8 +68,27 @@ function renderCart(){
             <span>Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</span>
         </div>
     `).join('');
-
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     cartTotal.innerText = `Rp ${total.toLocaleString('id-ID')}`;
     btnCheckout.disabled = false;
 }
+
+document.getElementById('btn-checkout').addEventListener('click', async () => {
+    if (cart.length === 0) return;
+    try {
+        const response = await fetch('http://localhost:3060/api/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: cart })
+        });
+        if (response.ok) {
+            alert('Pembayaran Berhasil!');
+            cart = []; // Kosongkan keranjang
+            renderCart();
+            location.reload(); // Refresh halaman untuk update tampilan stok terbaru
+        }
+    } catch (error) {
+        alert('Gagal Checkout!');
+        console.error(error);
+    }
+});
